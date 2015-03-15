@@ -1,0 +1,19 @@
+{
+  "uuid": "ad048612-0de1-46e7-be4a-a34eac4e51d2",
+  "shortName": "FaceMessage",
+  "longName": "FaceMessage",
+  "companyName": "MakeAwesomeHappen",
+  "versionCode": 1,
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite", "basalt"],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
