@@ -3,6 +3,25 @@
 static Window *window;
 static TextLayer *text_layer;
 static char *message;
+static Layer *window_layer;
+static GBitmap *s_image;
+static Layer *s_image_layer;
+
+
+static void  layer_update_callback(Layer *layer, GContext* ctx) {
+  // We make sure the dimensions of the GRect to draw into
+  // are equal to the size of the bitmap--otherwise the image
+  // will automatically tile. Which might be what *you* want.
+
+#ifdef PBL_PLATFORM_BASALT
+  GSize image_size = gbitmap_get_bounds(s_image).size;
+#else
+  GSize image_size = s_image->bounds.size;
+#endif
+
+  graphics_draw_bitmap_in_rect(ctx, s_image, GRect(0, 0, image_size.w, image_size.h));
+}
+
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Received");
   // Get the first pair
@@ -24,7 +43,27 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Get next pair, if any
     t = dict_read_next(iterator);
   }
-  text_layer_set_text(text_layer, sentiment);
+
+
+  // Check our sentiment, then add a corresponding image layer with the
+  //  the appropriate image. Before adding additional layers, remember to remove
+  // all children layer from the window layer.
+  if (strcmp(sentiment, "sad")) {
+    layer_remove_child_layers(window_layer);
+    layer_set_update_proc(s_image_layer, layer_update_callback);
+    layer_add_child(window_layer, s_image_layer);
+    s_image = gbitmap_create_with_resource(RESOURCE_ID_FROWN);
+  } else if (strcmp(sentiment, "happy")) {
+    layer_remove_child_layers(window_layer);
+    layer_set_update_proc(s_image_layer, layer_update_callback);
+    layer_add_child(window_layer, s_image_layer);
+    s_image = gbitmap_create_with_resource(RESOURCE_ID_SMILEY);
+  } else  {
+    layer_remove_child_layers(window_layer);
+    layer_set_update_proc(s_image_layer, layer_update_callback);
+    layer_add_child(window_layer, s_image_layer);
+    s_image = gbitmap_create_with_resource(RESOURCE_ID_NEUTRAL);
+  }
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
@@ -48,7 +87,12 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "up");
+
+  // Remove the any children layer of the window, then add a fresh text layer to
+  // show our message
+  layer_remove_child_layers(window_layer);
   text_layer_set_text(text_layer, message);
+  layer_add_child(window_layer, text_layer_get_layer(text_layer));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -63,11 +107,12 @@ static void click_config_provider(void *context) {
 }
 
 static void window_load(Window *window) {
-  Layer *window_layer = window_get_root_layer(window);
+  window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-
+  s_image_layer = layer_create(bounds);
   text_layer = text_layer_create((GRect) { .origin = { 0, 72 }, .size = { bounds.size.w, 20 } });
-  text_layer_set_text(text_layer, "bullshit");
+
+  text_layer_set_text(text_layer, "Welcome");
   text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(text_layer));
 }
