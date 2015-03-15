@@ -48,12 +48,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   // Check our sentiment, then add a corresponding image layer with the
   //  the appropriate image. Before adding additional layers, remember to remove
   // all children layer from the window layer.
-  if (strcmp(sentiment, "sad")) {
+  if (strcmp(sentiment, "sad") == 0) {
     layer_remove_child_layers(window_layer);
     layer_set_update_proc(s_image_layer, layer_update_callback);
     layer_add_child(window_layer, s_image_layer);
     s_image = gbitmap_create_with_resource(RESOURCE_ID_FROWN);
-  } else if (strcmp(sentiment, "happy")) {
+  } else if (strcmp(sentiment, "happy") == 0) {
     layer_remove_child_layers(window_layer);
     layer_set_update_proc(s_image_layer, layer_update_callback);
     layer_add_child(window_layer, s_image_layer);

@@ -14,6 +14,22 @@
     "dummy": 0
   },
   "resources": {
-    "media": []
-  }
+        "media": [
+            {
+                "file": "frown.png",
+                "name": "FROWN",
+                "type": "png"
+            },
+            {
+                "file": "smiley.png",
+                "name": "SMILEY",
+                "type": "png"
+            },
+            {
+                "file": "neutral.png",
+                "name": "NEUTRAL",
+                "type": "png"
+            }
+        ]
+    }
 }
